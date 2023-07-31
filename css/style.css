@@ -1,0 +1,37 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #403838;
+}
+
+#container {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+.box-item {
+  user-select: none;
+  box-sizing: border-box;
+  border: solid 1px #403838;
+  color: #fff;
+  font-weight: bold;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  position: absolute;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.5s ease;
+}
+
+.last-element {
+  cursor: pointer;
+}
+
+.last-element:hover {
+  color: #403838;
+}
