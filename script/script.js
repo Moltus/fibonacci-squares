@@ -4,61 +4,68 @@ const nbElements = 16;
 const coefficient = 1;
 const randomHsl = () => `hsla(${Math.random() * 360}, 100%, 50%, 1)`
 
-const sequenceItems = [];
+const sequenceTemplates = [];
 
-sequenceItems[0] = {};
-sequenceItems[0].size = sequenceItems[0].fontSize = sequenceItems[0].top
-  = sequenceItems[0].left = 0;
+const transformFromTemplate = (source, template, isNew = false) => {
+  source.textContent = template.size;
+  source.style.fontSize = template.size * coefficient / 3 + 'px';
+  source.style.width = source.style.height = template.size * coefficient + 'px';
+  source.style.top = template.top + 'px';
+  source.style.left = template.left + 'px';
+  if (isNew) {
+    source.classList.add('box-item');
+    source.style.backgroundColor = randomHsl();
+  }
+  return true;
+}
 
-sequenceItems[1] = {};
-sequenceItems[1].size = 1;
-sequenceItems[1].fontSize = 1 / 3;
-sequenceItems[1].top = sequenceItems[1].left = 0;
+sequenceTemplates[0] = {};
+sequenceTemplates[0].size = sequenceTemplates[0].fontSize = sequenceTemplates[0].top
+  = sequenceTemplates[0].left = 0;
+
+sequenceTemplates[1] = {};
+sequenceTemplates[1].size = 1;
+sequenceTemplates[1].fontSize = 1 / 3;
+sequenceTemplates[1].top = sequenceTemplates[1].left = 0;
 
 for (let i = 2; i < nbElements; i++) {
-  let itemSize = sequenceItems[i - 1].size + sequenceItems[i - 2].size;
-  let previousElement = sequenceItems[i - 1];
+  let itemSize = sequenceTemplates[i - 1].size + sequenceTemplates[i - 2].size;
+  let previousElement = sequenceTemplates[i - 1];
 
-  sequenceItems[i] = {};
-  sequenceItems[i].size = itemSize;
-  sequenceItems[i].fontSize = itemSize / 3;
+  sequenceTemplates[i] = {};
+  sequenceTemplates[i].size = itemSize;
+  sequenceTemplates[i].fontSize = itemSize / 3;
   if (i % 4 === 0) { // bottom left anchor
-    sequenceItems[i].top = previousElement.top + previousElement.size;
-    sequenceItems[i].left = previousElement.left;
+    sequenceTemplates[i].top = previousElement.top + previousElement.size;
+    sequenceTemplates[i].left = previousElement.left;
   } else if (i % 4 === 1) { // bottom right anchor
-    sequenceItems[i].top = previousElement.top + previousElement.size - itemSize;
-    sequenceItems[i].left = previousElement.left + previousElement.size;
+    sequenceTemplates[i].top = previousElement.top + previousElement.size - itemSize;
+    sequenceTemplates[i].left = previousElement.left + previousElement.size;
   } else if (i % 4 === 2) { // top right anchor
-    sequenceItems[i].top = previousElement.top - itemSize;
-    sequenceItems[i].left = previousElement.left + previousElement.size - itemSize;
+    sequenceTemplates[i].top = previousElement.top - itemSize;
+    sequenceTemplates[i].left = previousElement.left + previousElement.size - itemSize;
   } else if (i % 4 === 3) { // top left anchor
-    sequenceItems[i].top = previousElement.top;
-    sequenceItems[i].left = previousElement.left - itemSize;
+    sequenceTemplates[i].top = previousElement.top;
+    sequenceTemplates[i].left = previousElement.left - itemSize;
   }
 }
 
 // set container top and left position at 
 // horizontal and vertical minimum position of last 2 elements
 container.style.left = Math.min(
-  sequenceItems.at(-1).left
-  , sequenceItems.at(-2).left
+  sequenceTemplates.at(-1).left
+  , sequenceTemplates.at(-2).left
 ) * -coefficient + 10 + 'px';
 container.style.top = Math.min(
-  sequenceItems.at(-1).top
-  , sequenceItems.at(-2).top
+  sequenceTemplates.at(-1).top
+  , sequenceTemplates.at(-2).top
 ) * -coefficient + 10 + 'px';
 
 const sequenceElements = [];
 
-sequenceItems.forEach(e => {
+sequenceTemplates.forEach(e => {
   let newBox = document.createElement('div');
-  newBox.classList.add('box-item');
-  newBox.textContent = e.size;
-  newBox.style.backgroundColor = randomHsl();
-  newBox.style.fontSize = e.size * coefficient / 3 + 'px';
-  newBox.style.width = newBox.style.height = e.size * coefficient + 'px';
-  newBox.style.top = e.top + 'px';
-  newBox.style.left = e.left + 'px';
+  transformFromTemplate(newBox, e, true);
   sequenceElements.push(newBox);
   container.appendChild(newBox);
 });
@@ -75,25 +82,14 @@ function handleClick() {
     if (index >= nbElements - 1) {
       return;
     }
-    e.textContent = sequenceItems[index + 1].size;
-    e.style.width = e.style.height = sequenceItems[index + 1].size * coefficient + 'px';
-    e.style.top = sequenceItems[index + 1].top + 'px';
-    e.style.left = sequenceItems[index + 1].left + 'px';
-    e.style.fontSize = sequenceItems[index + 1].size / 3 + 'px';
+    transformFromTemplate(e, sequenceTemplates[index + 1]);
   });
   lastElement = sequenceElements.at(-1)
   lastElement.addEventListener('click', handleClick);
   lastElement.classList.add('last-element');
 
   let newBox = document.createElement('div');
-  newBox.classList.add('box-item');
-  newBox.textContent = 0;
-  newBox.style.backgroundColor = randomHsl();
-  newBox.style.size = 0;
-  newBox.style.fontSize = 0;
-  newBox.style.width = newBox.style.height = 0;
-  newBox.style.top = 0;
-  newBox.style.left = 0;
+  transformFromTemplate(newBox, sequenceTemplates[0]);
   sequenceElements.unshift(newBox);
   container.appendChild(newBox);
 }
